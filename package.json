@@ -1,0 +1,16 @@
+{
+  "name": "mongo-utils",
+  "version": "1.0.0",
+  "description": "A utility library for MongoDB",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sayan Bhattacharya <bhattacharyasayan.21@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+	"bluebird": "3.5.0",
+	"lodash": "4.17.4",
+	"mongodb": "2.2.29"
+  }
+}
