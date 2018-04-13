@@ -2,11 +2,11 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
 const Promise = require('bluebird');
-var dbHandleForShutDowns;
 Promise.promisifyAll(MongoClient);
 
 
 var insertIntoDb = function insertIntoDb(collectionName, documents) {
+  var dbHandleForShutDowns;
   if (documents.length < 1) {
     return Promise.resolve();
   }
@@ -26,6 +26,7 @@ var insertIntoDb = function insertIntoDb(collectionName, documents) {
 };
 
 var updateDocument = function updateDocument(collectionName, mutableEntity) {
+  var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
@@ -49,6 +50,7 @@ var updateDocument = function updateDocument(collectionName, mutableEntity) {
 };
 
 var upsertDocument = function upsertDocument(collectionName, mutableEntity, upsert, query) {
+  var dbHandleForShutDowns;
   if (!upsert){
     upsert = false;
   }
@@ -77,7 +79,6 @@ var upsertDocument = function upsertDocument(collectionName, mutableEntity, upse
 };
 
 var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectionName, query) {
-  // limit = limit ? limit : 5;
   var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
     .then(function (db) {
