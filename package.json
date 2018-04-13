@@ -2,7 +2,7 @@
   "name": "mongo-utils",
   "version": "1.0.0",
   "description": "A utility library for MongoDB",
-  "main": "main.js",
+  "main": "utils.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
