@@ -10,7 +10,6 @@ var insertIntoDb = function insertIntoDb(collectionName, documents) {
   if (documents.length < 1) {
     return Promise.resolve();
   }
-  var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
@@ -236,7 +235,7 @@ var registerForGracefulShutdown = function registerForGracefulShutdown(shutdown)
     'SIGINT': 2,
     'SIGTERM': 15
   };
-  
+
   Object.keys(signals).forEach(function (signal) {
     process.on(signal, function () {
       shutdown(signal, signals[signal]);
