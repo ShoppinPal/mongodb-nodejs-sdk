@@ -48,6 +48,34 @@ var updateDocument = function updateDocument(collectionName, mutableEntity) {
     });
 };
 
+var upsertDocument = function upsertDocument(collectionName, mutableEntity, upsert, query) {
+  if (!upsert){
+    upsert = false;
+  }
+  if (!query){
+    query =  {
+      _id: mutableEntity._id
+    };
+  }
+  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+    .then(function insertData(db) {
+      dbHandleForShutDowns = db;
+      return db.collection(collectionName).findOneAndUpdate(
+        query,
+        mutableEntity,
+        {
+          upsert: upsert
+        })
+        .finally(db.close.bind(db));
+    })
+    .catch(function catchErrors(err) {
+      if (dbHandleForShutDowns) {
+        dbHandleForShutDowns.close();
+      }
+      throw err;
+    });
+};
+
 var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectionName, query) {
   // limit = limit ? limit : 5;
   var dbHandleForShutDowns;
@@ -124,7 +152,6 @@ var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query
  * @param {*} processPageArgs - additional arguments required by processPage
  */
 var workOnItPageByPage = function workOnItPageByPage(db, collectionName, query, projection, pageSize, processPage, processPageArgs) {
-  //logger.debug( { log: { filter: query } } );
   projection = (projection) ? projection['_id'] = true : {'_id': true};
   processPageArgs = processPageArgs || []; // as a fallback, these can be empty
   return db
@@ -198,7 +225,6 @@ var bulkUpdate = function bulkUpdate(db, collectionName, updates, omits) {
   return batch.execute();
 };
 
-
 /**
  * Idea came from https://medium.com/@gchudnov/trapping-signals-in-docker-containers-7a57fdda7d86
  *
@@ -225,7 +251,6 @@ var isEmpty = function (input) {
     return input === undefined || input === null;
   }
 };
-
 
 var insertOne = function insertOne(collectionName, document) {
   if (!document) {
@@ -259,5 +284,7 @@ module.exports = {
   updateDocument: updateDocument,
   connectDb: connectDb,
   registerForGracefulShutdown: registerForGracefulShutdown,
-  workOnItPageByPage: workOnItPageByPage
+  workOnItPageByPage: workOnItPageByPage,
+  upsertDocument: upsertDocument
 };
+
