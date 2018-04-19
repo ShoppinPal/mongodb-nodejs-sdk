@@ -24,8 +24,11 @@ var insertIntoDb = function insertIntoDb(collectionName, documents) {
     });
 };
 
-var updateDocument = function updateDocument(collectionName, mutableEntity) {
+var updateDocument = function updateDocument(collectionName, mutableEntity, timeStamp) {
   var dbHandleForShutDowns;
+  if (timeStamp){
+    mutableEntity.lastModifiedAt = new Date().toISOString();
+  }
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
