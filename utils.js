@@ -4,7 +4,12 @@ const _ = require('lodash');
 const Promise = require('bluebird');
 Promise.promisifyAll(MongoClient);
 
-
+/**
+ * Method to insert documents in a given collection
+ * @param collectionName - Name of the collection
+ * @param documents - Array of documents that will be inserted.
+ * @returns {*}
+ */
 var insertIntoDb = function insertIntoDb(collectionName, documents) {
   var dbHandleForShutDowns;
   if (documents.length < 1) {
@@ -24,6 +29,13 @@ var insertIntoDb = function insertIntoDb(collectionName, documents) {
     });
 };
 
+/**
+ * Method to update a document in a given collection based on _id.
+ * @param collectionName - Name of the collection
+ * @param mutableEntity - Document to update in the collection
+ * @param timeStamp - Default is false. If set to true it adds a key lastModifiedAt to the document with the current timestamp.
+ * @returns {*}
+ */
 var updateDocument = function updateDocument(collectionName, mutableEntity, timeStamp) {
   var dbHandleForShutDowns;
   if (timeStamp){
@@ -51,6 +63,14 @@ var updateDocument = function updateDocument(collectionName, mutableEntity, time
     });
 };
 
+/**
+ * Method to upsert a document in a given collection
+ * @param collectionName - Name of the collection
+ * @param mutableEntity - Properties that will be updated.
+ * @param upsert - Default is false, if set to true it will create or update the document with the given set of properties.
+ * @param query - Default is querying by _id but a custom query can be specified.
+ * @returns {*}
+ */
 var upsertDocument = function upsertDocument(collectionName, mutableEntity, upsert, query) {
   var dbHandleForShutDowns;
   if (!upsert){
@@ -80,6 +100,12 @@ var upsertDocument = function upsertDocument(collectionName, mutableEntity, upse
     });
 };
 
+/**
+ * Method to find one document based on a given query
+ * @param collectionName - Name of the collection
+ * @param query - Query
+ * @returns {*}
+ */
 var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectionName, query) {
   var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
@@ -103,6 +129,14 @@ var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectio
     });
 };
 
+/**
+ * Method to find documents based on query
+ * @param collectionName - Name of the collection
+ * @param query - Query
+ * @param limit - Limit to the query
+ * @param projection - Query Projection
+ * @returns {*}
+ */
 var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionName, query, limit, projection) {
   if (isEmpty(limit)) {
     limit = 0; // A limit() value of 0 (i.e. .limit(0)) is equivalent to setting no limit.
@@ -125,6 +159,12 @@ var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionNam
     });
 };
 
+/**
+ * Method to count documents based on query
+ * @param collectionName
+ * @param query
+ * @returns {*}
+ */
 var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query) {
   var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
@@ -141,8 +181,8 @@ var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query
     });
 };
 
-/**
- * Asumptions:
+/** This method requires you to connect to the DB first by using connectDb().
+ * Assumptions:
  *   a) sorts will happen by `_id` in this method
  *   b) `query._id` is overriden by this method
  *
@@ -185,6 +225,10 @@ var workOnItPageByPage = function workOnItPageByPage(db, collectionName, query, 
     });
 };
 
+/**
+ * Method to connect to the db
+ * @returns {*}
+ */
 var connectDb = function connectDb() {
   var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
@@ -200,6 +244,13 @@ var connectDb = function connectDb() {
     });
 };
 
+/**
+ * Method to create documents in bulk in a given collection.
+ * @param db
+ * @param collectionName - Name of the collection
+ * @param documents - Array of documents to be created
+ * @returns {*}
+ */
 var bulkCreate = function bulkCreate(db, collectionName, documents) {
   if (!documents || documents.length === 0) return Promise.resolve();
   // (1) Initialize the unordered Batch
@@ -213,6 +264,14 @@ var bulkCreate = function bulkCreate(db, collectionName, documents) {
   return batch.execute();
 };
 
+/**
+ * Method to update documents bulk in a given collection
+ * @param db
+ * @param collectionName - Name of the collection
+ * @param updates - Updates in the documents
+ * @param omits
+ * @returns {*}
+ */
 var bulkUpdate = function bulkUpdate(db, collectionName, updates, omits) {
   if (!updates || updates.length === 0) return Promise.resolve();
   // (1) Initialize the unordered Batch
@@ -255,6 +314,12 @@ var isEmpty = function (input) {
   }
 };
 
+/**
+ * Method to insert a single document.
+ * @param collectionName
+ * @param document
+ * @returns {*}
+ */
 var insertOne = function insertOne(collectionName, document) {
   if (!document) {
     return Promise.resolve();
