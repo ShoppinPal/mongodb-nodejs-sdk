@@ -338,12 +338,58 @@ var insertOne = function insertOne(collectionName, document) {
       throw err;
     });
 };
+/**
+ * Method to drop a collection
+ * @param name - Name of the collection to drop.
+ * @returns {*}
+ */
+var dropCollection = function dropCollection(name) {
+  var dbHandleForShutDowns;
+  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+    .then(function dropDb(db) {
+      dbHandleForShutDowns = db;
+      return db.collection(name).drop()
+        .finally(db.close.bind(db));
+    })
+    .catch(function catchErrors(err) {
+      if (dbHandleForShutDowns) {
+        dbHandleForShutDowns.close();
+      }
+      throw err;
+    });
+};
 
+/**
+ * Method to find distinct documents in a collection
+ * @param collectionName - Name of the collection
+ * @param field - Distinct Field
+ * @returns {*}
+ */
+var findDistinctDocuments = function findDistinctDocuments(collectionName, field) {
+  var dbHandleForShutDowns;
+  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+    .then(function (db) {
+      dbHandleForShutDowns = db;
+      return db.collection(collectionName);
+    })
+    .then(function(collection){
+      return collection.distinct(field, {[field]: {$exists: true}})
+        .finally(dbHandleForShutDowns.close.bind(dbHandleForShutDowns));
+    })
+    .catch(function catchErrors(err) {
+      if (dbHandleForShutDowns) {
+        dbHandleForShutDowns.close();
+      }
+      throw err;
+    });
+};
 
 module.exports = {
   bulkCreate: bulkCreate,
   insertOne: insertOne,
   bulkUpdate: bulkUpdate,
+  findDistinctDocuments: findDistinctDocuments,
+  dropCollection: dropCollection,
   findOneDocumentBasedOnQuery: findOneDocumentBasedOnQuery,
   findDocumentsBasedOnQuery: findDocumentsBasedOnQuery,
   insertIntoDb: insertIntoDb,
