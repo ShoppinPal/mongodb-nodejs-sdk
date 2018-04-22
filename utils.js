@@ -4,7 +4,12 @@ const _ = require('lodash');
 const Promise = require('bluebird');
 Promise.promisifyAll(MongoClient);
 
-
+/**
+ * Method to insert documents in a given collection
+ * @param {string} collectionName Name of the collection
+ * @param {array} documents - Array of documents that will be inserted.
+ * @returns {object} A document with `acknowledged: true` and an array of successfully inserted _id's
+ */
 var insertIntoDb = function insertIntoDb(collectionName, documents) {
   var dbHandleForShutDowns;
   if (documents.length < 1) {
@@ -24,8 +29,18 @@ var insertIntoDb = function insertIntoDb(collectionName, documents) {
     });
 };
 
-var updateDocument = function updateDocument(collectionName, mutableEntity) {
+/**
+ * Method to update a document in a given collection based on _id.
+ * @param {string} collectionName Name of the collection
+ * @param {object} mutableEntity - Document to update in the collection
+ * @param {boolean} timeStamp - Default is false. If set to true it adds a key lastModifiedAt to the document with the current timestamp.
+ * @returns {*}
+ */
+var updateDocument = function updateDocument(collectionName, mutableEntity, timeStamp) {
   var dbHandleForShutDowns;
+  if (timeStamp){
+    mutableEntity.lastModifiedAt = new Date().toISOString();
+  }
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
@@ -48,6 +63,14 @@ var updateDocument = function updateDocument(collectionName, mutableEntity) {
     });
 };
 
+/**
+ * Method to upsert a document in a given collection
+ * @param {string} collectionName Name of the collection
+ * @param {object} mutableEntity Properties that will be updated.
+ * @param {boolean} upsert Default is false, if set to true it will create or update the document with the given set of properties.
+ * @param {object} query Default is querying by _id but a custom query can be specified.
+ * @returns {*}
+ */
 var upsertDocument = function upsertDocument(collectionName, mutableEntity, upsert, query) {
   var dbHandleForShutDowns;
   if (!upsert){
@@ -77,6 +100,12 @@ var upsertDocument = function upsertDocument(collectionName, mutableEntity, upse
     });
 };
 
+/**
+ * Method to find one document based on a given query
+ * @param {string} collectionName Name of the collection
+ * @param {object} query Query
+ * @returns {object} an document if a match is found based on the query.
+ */
 var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectionName, query) {
   var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
@@ -100,6 +129,14 @@ var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectio
     });
 };
 
+/**
+ * Method to find documents based on query
+ * @param {string} collectionName Name of the collection
+ * @param {object} query  Query
+ * @param {number} limit Limit to the query. By default there's no limit until specified.
+ * @param {object} projection Query Projection
+ * @returns {array} an array of documents based on the query.
+ */
 var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionName, query, limit, projection) {
   if (isEmpty(limit)) {
     limit = 0; // A limit() value of 0 (i.e. .limit(0)) is equivalent to setting no limit.
@@ -122,6 +159,12 @@ var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionNam
     });
 };
 
+/**
+ * Method to count documents based on query
+ * @param {string} collectionName Name of the collection
+ * @param {object} query Query object
+ * @returns {number} the count of documents based on a given query
+ */
 var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query) {
   var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
@@ -139,17 +182,19 @@ var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query
 };
 
 /**
- * Asumptions:
+ * Method to work on a collection page by page. PageSize can be even 1. Ideal if you want to work in batches.
+ * This method requires you to connect to the DB first by using connectDb(). \n \n
+ * Assumptions:
  *   a) sorts will happen by `_id` in this method
  *   b) `query._id` is overriden by this method
  *
- * @param {*} db
- * @param {*} collectionName
- * @param {*} query
- * @param {*} projection
- * @param {*} pageSize
- * @param {*} processPage - pass a function to handle the pagedResults
- * @param {*} processPageArgs - additional arguments required by processPage
+ * @param {object} db
+ * @param {string} collectionName Name of the collection
+ * @param {object} query query object
+ * @param {object} projection fields to project
+ * @param {number} pageSize page size to return from the collection.
+ * @param {function} processPage pass a function to handle the pagedResults
+ * @param {array} processPageArgs additional arguments required by processPage
  */
 var workOnItPageByPage = function workOnItPageByPage(db, collectionName, query, projection, pageSize, processPage, processPageArgs) {
   projection = (projection) ? projection['_id'] = true : {'_id': true};
@@ -182,6 +227,10 @@ var workOnItPageByPage = function workOnItPageByPage(db, collectionName, query, 
     });
 };
 
+/**
+ * Method to connect to the db
+ * @returns {object} db connection
+ */
 var connectDb = function connectDb() {
   var dbHandleForShutDowns;
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
@@ -197,6 +246,13 @@ var connectDb = function connectDb() {
     });
 };
 
+/**
+ * Method to create documents in bulk in a given collection.
+ * @param {object} db
+ * @param {string} collectionName - Name of the collection
+ * @param {array }documents Array of documents to be created
+ * @returns {*}
+ */
 var bulkCreate = function bulkCreate(db, collectionName, documents) {
   if (!documents || documents.length === 0) return Promise.resolve();
   // (1) Initialize the unordered Batch
@@ -210,6 +266,14 @@ var bulkCreate = function bulkCreate(db, collectionName, documents) {
   return batch.execute();
 };
 
+/**
+ * Method to update documents bulk in a given collection
+ * @param {object} db
+ * @param {string} collectionName Name of the collection
+ * @param {array} updates array of documents to update
+ * @param {object} omits  Fields to omit while updating the documents in the collection
+ * @returns {*}
+ */
 var bulkUpdate = function bulkUpdate(db, collectionName, updates, omits) {
   if (!updates || updates.length === 0) return Promise.resolve();
   // (1) Initialize the unordered Batch
@@ -252,6 +316,12 @@ var isEmpty = function (input) {
   }
 };
 
+/**
+ * Method to insert a single document.
+ * @param {string} collectionName name of the collection
+ * @param {object} document document to insert
+ * @returns {*}
+ */
 var insertOne = function insertOne(collectionName, document) {
   if (!document) {
     return Promise.resolve();
@@ -270,12 +340,58 @@ var insertOne = function insertOne(collectionName, document) {
       throw err;
     });
 };
+/**
+ * Method to drop a collection
+ * @param {string} name name of the collection to drop.
+ * @returns {*}
+ */
+var dropCollection = function dropCollection(name) {
+  var dbHandleForShutDowns;
+  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+    .then(function dropDb(db) {
+      dbHandleForShutDowns = db;
+      return db.collection(name).drop()
+        .finally(db.close.bind(db));
+    })
+    .catch(function catchErrors(err) {
+      if (dbHandleForShutDowns) {
+        dbHandleForShutDowns.close();
+      }
+      throw err;
+    });
+};
 
+/**
+ * Method to find distinct documents in a collection
+ * @param {string} collectionName name of the collection
+ * @param {string} field - Distinct Field
+ * @returns {array} an array of field values that are in the collection
+ */
+var findDistinctDocuments = function findDistinctDocuments(collectionName, field) {
+  var dbHandleForShutDowns;
+  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+    .then(function (db) {
+      dbHandleForShutDowns = db;
+      return db.collection(collectionName);
+    })
+    .then(function(collection){
+      return collection.distinct(field, {[field]: {$exists: true}})
+        .finally(dbHandleForShutDowns.close.bind(dbHandleForShutDowns));
+    })
+    .catch(function catchErrors(err) {
+      if (dbHandleForShutDowns) {
+        dbHandleForShutDowns.close();
+      }
+      throw err;
+    });
+};
 
 module.exports = {
   bulkCreate: bulkCreate,
   insertOne: insertOne,
   bulkUpdate: bulkUpdate,
+  findDistinctDocuments: findDistinctDocuments,
+  dropCollection: dropCollection,
   findOneDocumentBasedOnQuery: findOneDocumentBasedOnQuery,
   findDocumentsBasedOnQuery: findDocumentsBasedOnQuery,
   insertIntoDb: insertIntoDb,
