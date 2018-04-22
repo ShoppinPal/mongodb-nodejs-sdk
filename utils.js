@@ -6,9 +6,9 @@ Promise.promisifyAll(MongoClient);
 
 /**
  * Method to insert documents in a given collection
- * @param collectionName - Name of the collection
- * @param documents - Array of documents that will be inserted.
- * @returns {*}
+ * @param {string} collectionName Name of the collection
+ * @param {array} documents - Array of documents that will be inserted.
+ * @returns {object} A document with `acknowledged: true` and an array of successfully inserted _id's
  */
 var insertIntoDb = function insertIntoDb(collectionName, documents) {
   var dbHandleForShutDowns;
@@ -31,9 +31,9 @@ var insertIntoDb = function insertIntoDb(collectionName, documents) {
 
 /**
  * Method to update a document in a given collection based on _id.
- * @param collectionName - Name of the collection
- * @param mutableEntity - Document to update in the collection
- * @param timeStamp - Default is false. If set to true it adds a key lastModifiedAt to the document with the current timestamp.
+ * @param {string} collectionName Name of the collection
+ * @param {object} mutableEntity - Document to update in the collection
+ * @param {boolean} timeStamp - Default is false. If set to true it adds a key lastModifiedAt to the document with the current timestamp.
  * @returns {*}
  */
 var updateDocument = function updateDocument(collectionName, mutableEntity, timeStamp) {
@@ -65,10 +65,10 @@ var updateDocument = function updateDocument(collectionName, mutableEntity, time
 
 /**
  * Method to upsert a document in a given collection
- * @param collectionName - Name of the collection
- * @param mutableEntity - Properties that will be updated.
- * @param upsert - Default is false, if set to true it will create or update the document with the given set of properties.
- * @param query - Default is querying by _id but a custom query can be specified.
+ * @param {string} collectionName Name of the collection
+ * @param {object} mutableEntity Properties that will be updated.
+ * @param {boolean} upsert Default is false, if set to true it will create or update the document with the given set of properties.
+ * @param {object} query Default is querying by _id but a custom query can be specified.
  * @returns {*}
  */
 var upsertDocument = function upsertDocument(collectionName, mutableEntity, upsert, query) {
@@ -102,9 +102,9 @@ var upsertDocument = function upsertDocument(collectionName, mutableEntity, upse
 
 /**
  * Method to find one document based on a given query
- * @param collectionName - Name of the collection
- * @param query - Query
- * @returns {*}
+ * @param {string} collectionName Name of the collection
+ * @param {object} query Query
+ * @returns {object} an document if a match is found based on the query.
  */
 var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectionName, query) {
   var dbHandleForShutDowns;
@@ -131,11 +131,11 @@ var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectio
 
 /**
  * Method to find documents based on query
- * @param collectionName - Name of the collection
- * @param query - Query
- * @param limit - Limit to the query
- * @param projection - Query Projection
- * @returns {*}
+ * @param {string} collectionName Name of the collection
+ * @param {object} query  Query
+ * @param {number} limit Limit to the query. By default there's no limit until specified.
+ * @param {object} projection Query Projection
+ * @returns {array} an array of documents based on the query.
  */
 var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionName, query, limit, projection) {
   if (isEmpty(limit)) {
@@ -161,9 +161,9 @@ var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionNam
 
 /**
  * Method to count documents based on query
- * @param collectionName
- * @param query
- * @returns {*}
+ * @param {string} collectionName Name of the collection
+ * @param {object} query Query object
+ * @returns {number} the count of documents based on a given query
  */
 var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query) {
   var dbHandleForShutDowns;
@@ -181,18 +181,20 @@ var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query
     });
 };
 
-/** This method requires you to connect to the DB first by using connectDb().
+/**
+ * Method to work on a collection page by page. PageSize can be even 1. Ideal if you want to work in batches.
+ * This method requires you to connect to the DB first by using connectDb(). \n \n
  * Assumptions:
  *   a) sorts will happen by `_id` in this method
  *   b) `query._id` is overriden by this method
  *
- * @param {*} db
- * @param {*} collectionName
- * @param {*} query
- * @param {*} projection
- * @param {*} pageSize
- * @param {*} processPage - pass a function to handle the pagedResults
- * @param {*} processPageArgs - additional arguments required by processPage
+ * @param {object} db
+ * @param {string} collectionName Name of the collection
+ * @param {object} query query object
+ * @param {object} projection fields to project
+ * @param {number} pageSize page size to return from the collection.
+ * @param {function} processPage pass a function to handle the pagedResults
+ * @param {array} processPageArgs additional arguments required by processPage
  */
 var workOnItPageByPage = function workOnItPageByPage(db, collectionName, query, projection, pageSize, processPage, processPageArgs) {
   projection = (projection) ? projection['_id'] = true : {'_id': true};
@@ -227,7 +229,7 @@ var workOnItPageByPage = function workOnItPageByPage(db, collectionName, query, 
 
 /**
  * Method to connect to the db
- * @returns {*}
+ * @returns {object} db connection
  */
 var connectDb = function connectDb() {
   var dbHandleForShutDowns;
@@ -246,9 +248,9 @@ var connectDb = function connectDb() {
 
 /**
  * Method to create documents in bulk in a given collection.
- * @param db
- * @param collectionName - Name of the collection
- * @param documents - Array of documents to be created
+ * @param {object} db
+ * @param {string} collectionName - Name of the collection
+ * @param {array }documents Array of documents to be created
  * @returns {*}
  */
 var bulkCreate = function bulkCreate(db, collectionName, documents) {
@@ -266,10 +268,10 @@ var bulkCreate = function bulkCreate(db, collectionName, documents) {
 
 /**
  * Method to update documents bulk in a given collection
- * @param db
- * @param collectionName - Name of the collection
- * @param updates - Updates in the documents
- * @param omits - Fields to omit while updating the documents in the collection
+ * @param {object} db
+ * @param {string} collectionName Name of the collection
+ * @param {array} updates array of documents to update
+ * @param {object} omits  Fields to omit while updating the documents in the collection
  * @returns {*}
  */
 var bulkUpdate = function bulkUpdate(db, collectionName, updates, omits) {
@@ -316,8 +318,8 @@ var isEmpty = function (input) {
 
 /**
  * Method to insert a single document.
- * @param collectionName
- * @param document
+ * @param {string} collectionName name of the collection
+ * @param {object} document document to insert
  * @returns {*}
  */
 var insertOne = function insertOne(collectionName, document) {
@@ -340,7 +342,7 @@ var insertOne = function insertOne(collectionName, document) {
 };
 /**
  * Method to drop a collection
- * @param name - Name of the collection to drop.
+ * @param {string} name name of the collection to drop.
  * @returns {*}
  */
 var dropCollection = function dropCollection(name) {
@@ -361,9 +363,9 @@ var dropCollection = function dropCollection(name) {
 
 /**
  * Method to find distinct documents in a collection
- * @param collectionName - Name of the collection
- * @param field - Distinct Field
- * @returns {*}
+ * @param {string} collectionName name of the collection
+ * @param {string} field - Distinct Field
+ * @returns {array} an array of field values that are in the collection
  */
 var findDistinctDocuments = function findDistinctDocuments(collectionName, field) {
   var dbHandleForShutDowns;
