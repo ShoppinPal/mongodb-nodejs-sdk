@@ -269,7 +269,7 @@ var bulkCreate = function bulkCreate(db, collectionName, documents) {
  * @param db
  * @param collectionName - Name of the collection
  * @param updates - Updates in the documents
- * @param omits
+ * @param omits - Fields to omit while updating the documents in the collection
  * @returns {*}
  */
 var bulkUpdate = function bulkUpdate(db, collectionName, updates, omits) {
