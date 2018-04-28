@@ -386,8 +386,23 @@ var findDistinctDocuments = function findDistinctDocuments(collectionName, field
     });
 };
 
+/**
+ * Method to bulk update documents in a collection given a specific query.
+ * @param {object} db
+ * @param {string} collectionName Name of the collection
+ * @param {object} updates Values that will be updated. Can update multiple values or set new values too.
+ * @param {object} query Query to find the documents in the collection to update
+ * @returns {object}
+ */
+var bulkUpdateByQuery = function bulkUpdateByQuery(db, collectionName, updates, query) {
+  var bulk = db.collection(collectionName).initializeUnorderedBulkOp();
+  bulk.find(query).update({$set: updates});
+  return bulk.execute();
+};
+
 module.exports = {
   bulkCreate: bulkCreate,
+  bulkUpdateByQuery: bulkUpdateByQuery,
   insertOne: insertOne,
   bulkUpdate: bulkUpdate,
   findDistinctDocuments: findDistinctDocuments,
