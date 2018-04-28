@@ -16,6 +16,7 @@
 -   [insertOne][12]
 -   [dropCollection][13]
 -   [findDistinctDocuments][14]
+-   [bulkUpdateByQuery][15]
 
 ## insertIntoDb
 
@@ -23,10 +24,10 @@ Method to insert documents in a given collection
 
 **Parameters**
 
--   `collectionName` **[string][15]** Name of the collection
--   `documents` **[array][16]** Array of documents that will be inserted.
+-   `collectionName` **[string][16]** Name of the collection
+-   `documents` **[array][17]** Array of documents that will be inserted.
 
-Returns **[object][17]** A document with `acknowledged: true` and an array of successfully inserted \_id's
+Returns **[object][18]** A document with `acknowledged: true` and an array of successfully inserted \_id's
 
 ## updateDocument
 
@@ -34,9 +35,9 @@ Method to update a document in a given collection based on \_id.
 
 **Parameters**
 
--   `collectionName` **[string][15]** Name of the collection
--   `mutableEntity` **[object][17]** Document to update in the collection
--   `timeStamp` **[boolean][18]** Default is false. If set to true it adds a key lastModifiedAt to the document with the current timestamp.
+-   `collectionName` **[string][16]** Name of the collection
+-   `mutableEntity` **[object][18]** Document to update in the collection
+-   `timeStamp` **[boolean][19]** Default is false. If set to true it adds a key lastModifiedAt to the document with the current timestamp.
 
 Returns **any** 
 
@@ -46,10 +47,10 @@ Method to upsert a document in a given collection
 
 **Parameters**
 
--   `collectionName` **[string][15]** Name of the collection
--   `mutableEntity` **[object][17]** Properties that will be updated.
--   `upsert` **[boolean][18]** Default is false, if set to true it will create or update the document with the given set of properties.
--   `query` **[object][17]** Default is querying by \_id but a custom query can be specified.
+-   `collectionName` **[string][16]** Name of the collection
+-   `mutableEntity` **[object][18]** Properties that will be updated.
+-   `upsert` **[boolean][19]** Default is false, if set to true it will create or update the document with the given set of properties.
+-   `query` **[object][18]** Default is querying by \_id but a custom query can be specified.
 
 Returns **any** 
 
@@ -59,10 +60,10 @@ Method to find one document based on a given query
 
 **Parameters**
 
--   `collectionName` **[string][15]** Name of the collection
--   `query` **[object][17]** Query
+-   `collectionName` **[string][16]** Name of the collection
+-   `query` **[object][18]** Query
 
-Returns **[object][17]** an document if a match is found based on the query.
+Returns **[object][18]** an document if a match is found based on the query.
 
 ## findDocumentsBasedOnQuery
 
@@ -70,12 +71,12 @@ Method to find documents based on query
 
 **Parameters**
 
--   `collectionName` **[string][15]** Name of the collection
--   `query` **[object][17]** Query
--   `limit` **[number][19]** Limit to the query. By default there's no limit until specified.
--   `projection` **[object][17]** Query Projection
+-   `collectionName` **[string][16]** Name of the collection
+-   `query` **[object][18]** Query
+-   `limit` **[number][20]** Limit to the query. By default there's no limit until specified.
+-   `projection` **[object][18]** Query Projection
 
-Returns **[array][16]** an array of documents based on the query.
+Returns **[array][17]** an array of documents based on the query.
 
 ## countDocumentsByQuery
 
@@ -83,10 +84,10 @@ Method to count documents based on query
 
 **Parameters**
 
--   `collectionName` **[string][15]** Name of the collection
--   `query` **[object][17]** Query object
+-   `collectionName` **[string][16]** Name of the collection
+-   `query` **[object][18]** Query object
 
-Returns **[number][19]** the count of documents based on a given query
+Returns **[number][20]** the count of documents based on a given query
 
 ## workOnItPageByPage
 
@@ -98,19 +99,19 @@ Assumptions:
 
 **Parameters**
 
--   `db` **[object][17]** 
--   `collectionName` **[string][15]** Name of the collection
--   `query` **[object][17]** query object
--   `projection` **[object][17]** fields to project
--   `pageSize` **[number][19]** page size to return from the collection.
--   `processPage` **[function][20]** pass a function to handle the pagedResults
--   `processPageArgs` **[array][16]** additional arguments required by processPage
+-   `db` **[object][18]** 
+-   `collectionName` **[string][16]** Name of the collection
+-   `query` **[object][18]** query object
+-   `projection` **[object][18]** fields to project
+-   `pageSize` **[number][20]** page size to return from the collection.
+-   `processPage` **[function][21]** pass a function to handle the pagedResults
+-   `processPageArgs` **[array][17]** additional arguments required by processPage
 
 ## connectDb
 
 Method to connect to the db
 
-Returns **[object][17]** db connection
+Returns **[object][18]** db connection
 
 ## bulkCreate
 
@@ -118,9 +119,9 @@ Method to create documents in bulk in a given collection.
 
 **Parameters**
 
--   `db` **[object][17]** 
--   `collectionName` **[string][15]** Name of the collection
--   `documents` **[array][16]** Array of documents to be created
+-   `db` **[object][18]** 
+-   `collectionName` **[string][16]** Name of the collection
+-   `documents` **[array][17]** Array of documents to be created
 
 Returns **any** 
 
@@ -130,16 +131,16 @@ Method to update documents bulk in a given collection
 
 **Parameters**
 
--   `db` **[object][17]** 
--   `collectionName` **[string][15]** Name of the collection
--   `updates` **[array][16]** array of documents to update
--   `omits` **[object][17]** Fields to omit while updating the documents in the collection
+-   `db` **[object][18]** 
+-   `collectionName` **[string][16]** Name of the collection
+-   `updates` **[array][17]** array of documents to update
+-   `omits` **[object][18]** Fields to omit while updating the documents in the collection
 
 Returns **any** 
 
 ## registerForGracefulShutdown
 
-Idea came from [https://medium.com/@gchudnov/trapping-signals-in-docker-containers-7a57fdda7d86][21]
+Idea came from [https://medium.com/@gchudnov/trapping-signals-in-docker-containers-7a57fdda7d86][22]
 
 **Parameters**
 
@@ -151,8 +152,8 @@ Method to insert a single document.
 
 **Parameters**
 
--   `collectionName` **[string][15]** name of the collection
--   `document` **[object][17]** document to insert
+-   `collectionName` **[string][16]** name of the collection
+-   `document` **[object][18]** document to insert
 
 Returns **any** 
 
@@ -162,7 +163,7 @@ Method to drop a collection
 
 **Parameters**
 
--   `name` **[string][15]** name of the collection to drop.
+-   `name` **[string][16]** name of the collection to drop.
 
 Returns **any** 
 
@@ -172,10 +173,23 @@ Method to find distinct documents in a collection
 
 **Parameters**
 
--   `collectionName` **[string][15]** name of the collection
--   `field` **[string][15]** Distinct Field
+-   `collectionName` **[string][16]** name of the collection
+-   `field` **[string][16]** Distinct Field
 
-Returns **[array][16]** an array of field values that are in the collection
+Returns **[array][17]** an array of field values that are in the collection
+
+## bulkUpdateByQuery
+
+Method to bulk update documents in a collection given a specific query.
+
+**Parameters**
+
+-   `db` **[object][18]** 
+-   `collectionName` **[string][16]** Name of the collection
+-   `updates` **[object][18]** Values that will be updated. Can update multiple values or set new values too.
+-   `query` **[object][18]** Query to find the documents in the collection to update
+
+Returns **[object][18]** 
 
 [1]: #insertintodb
 
@@ -205,16 +219,18 @@ Returns **[array][16]** an array of field values that are in the collection
 
 [14]: #finddistinctdocuments
 
-[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[15]: #bulkupdatebyquery
 
-[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[21]: https://medium.com/@gchudnov/trapping-signals-in-docker-containers-7a57fdda7d86
+[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[22]: https://medium.com/@gchudnov/trapping-signals-in-docker-containers-7a57fdda7d86
