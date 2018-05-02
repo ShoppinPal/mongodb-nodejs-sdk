@@ -350,8 +350,16 @@ var dropCollection = function dropCollection(name) {
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
     .then(function dropDb(db) {
       dbHandleForShutDowns = db;
-      return db.collection(name).drop()
-        .finally(db.close.bind(db));
+      return db.listCollections().toArray();
+    })
+    .then(function (collections) {
+      if(collections.indexOf(name) > -1){
+        return db.collection(name).drop()
+          .finally(db.close.bind(db));
+      }
+      else {
+        return Promise.resolve(false);
+      }
     })
     .catch(function catchErrors(err) {
       if (dbHandleForShutDowns) {
