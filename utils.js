@@ -353,9 +353,12 @@ var dropCollection = function dropCollection(name) {
       return db.listCollections().toArray();
     })
     .then(function (collections) {
-      if(collections.indexOf(name) > -1){
-        return db.collection(name).drop()
-          .finally(db.close.bind(db));
+      var collectionNames = collections.map(function (collection) {
+        return collection.name;
+      });
+      if(collectionNames.indexOf(name) > -1){
+        return dbHandleForShutDowns.collection(name).drop()
+          .finally(dbHandleForShutDowns.close.bind(db));
       }
       else {
         return Promise.resolve(false);
