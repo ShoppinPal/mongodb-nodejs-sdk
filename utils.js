@@ -358,7 +358,7 @@ var dropCollection = function dropCollection(name) {
       });
       if(collectionNames.indexOf(name) > -1){
         return dbHandleForShutDowns.collection(name).drop()
-          .finally(dbHandleForShutDowns.close.bind(db));
+          .finally(dbHandleForShutDowns.close.bind(dbHandleForShutDowns));
       }
       else {
         return Promise.resolve(false);
