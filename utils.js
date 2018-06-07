@@ -398,6 +398,32 @@ var findDistinctDocuments = function findDistinctDocuments(collectionName, field
 };
 
 /**
+ * Method to process a batch of documents in a collection
+ * @param db - db instance connection
+ * @param collectionName - Name of the collection
+ * @param query - Query on the basis of which documents will be picked from a collection.
+ * @param batchSize - Size of the batch you'd want to process
+ * @param processBatch - Function/method to run once desired docs are fetched from the DB.
+ * @param processBatchArgs - Additional arguments that are required to be passed onto the processBatch method.
+ */
+var processABatchOfDocuments = function processABatchOfDocuments(db, collectionName, query, batchSize, processBatch, processBatchArgs){
+  processBatchArgs = processBatchArgs || [];
+  return db
+      .collection(collectionName)
+      .find(query)
+      .sort({'_id': 1}).limit(batchSize)
+      .toArray()
+      .then(function processPagedResults(documents) {
+        if (!documents || documents.length < 1) {
+          return Promise.resolve(false);
+        }
+        else {
+          return processBatch(db, documents, ...processBatchArgs);
+        }
+      });
+};
+
+/**
  * Method to bulk update documents in a collection given a specific query.
  * @param {object} db
  * @param {string} collectionName Name of the collection
@@ -425,6 +451,7 @@ module.exports = {
   countDocumentsByQuery: countDocumentsByQuery,
   updateDocument: updateDocument,
   connectDb: connectDb,
+  processABatchOfDocuments: processABatchOfDocuments,
   registerForGracefulShutdown: registerForGracefulShutdown,
   workOnItPageByPage: workOnItPageByPage,
   upsertDocument: upsertDocument
