@@ -1,11 +1,14 @@
 {
   "name": "mongodb-nodejs-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A utility library for MongoDB",
   "main": "utils.js",
   "scripts": {
     "generateDocs": "documentation build utils.js -f md -o docs/index.md"
   },
+  "keywords": [
+   "mongodb-nodejs-sdk", "mongodb-node", "mongodb-sdk", "mongodb", "sdk", "promise"
+  ],
   "author": "Sayan Bhattacharya <bhattacharyasayan.21@gmail.com>",
   "license": "ISC",
   "dependencies": {

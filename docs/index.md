@@ -63,6 +63,7 @@ Method to find one document based on a given query
 
 -   `collectionName` **[string][17]** Name of the collection
 -   `query` **[object][19]** Query
+-   `sort` **[object][19]** Sort, by default it sorts by \_id.
 
 Returns **[object][19]** an document if a match is found based on the query.
 
