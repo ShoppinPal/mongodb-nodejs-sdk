@@ -104,14 +104,20 @@ var upsertDocument = function upsertDocument(collectionName, mutableEntity, upse
  * Method to find one document based on a given query
  * @param {string} collectionName Name of the collection
  * @param {object} query Query
+ * @param {object} sort Sort, by default it sorts by _id.
  * @returns {object} an document if a match is found based on the query.
  */
-var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectionName, query) {
+var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectionName, query, sort) {
   var dbHandleForShutDowns;
+  if(!sort){
+    sort = {
+      _id: 1
+    };
+  }
   return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
     .then(function (db) {
       dbHandleForShutDowns = db;
-      return db.collection(collectionName).find(query).sort({_id: -1}).limit(5)
+      return db.collection(collectionName).find(query).sort(sort).limit(5)
         .toArray()
         .then(function(documents) {
           return documents[0];
