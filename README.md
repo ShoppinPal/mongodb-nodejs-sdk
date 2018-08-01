@@ -2,7 +2,7 @@
 
 To use this SDK you need to configure the `DB_URL` by setting it as an environment variable.
 
-For example - ```export $DB_URL="<MONGODB_VALID_URL_STRING>"```
+For example - ```export DB_URL="<MONGODB_VALID_URL_STRING>"```
 
 Docs - https://shoppinpal.github.io/mongodb-nodejs-sdk/
 
