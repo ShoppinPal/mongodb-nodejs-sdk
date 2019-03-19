@@ -15,7 +15,7 @@ var insertIntoDb = function insertIntoDb(collectionName, documents) {
   if (documents.length < 1) {
     return Promise.resolve();
   }
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName).insertMany(documents, {w: 1})
@@ -41,7 +41,7 @@ var updateDocument = function updateDocument(collectionName, mutableEntity, time
   if (timeStamp){
     mutableEntity.lastModifiedAt = new Date().toISOString();
   }
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName).findOneAndReplace(
@@ -81,7 +81,7 @@ var upsertDocument = function upsertDocument(collectionName, mutableEntity, upse
       _id: mutableEntity._id
     };
   }
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName).findOneAndUpdate(
@@ -114,7 +114,7 @@ var findOneDocumentBasedOnQuery = function findOneDocumentBasedOnQuery(collectio
       _id: 1
     };
   }
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function (db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName).find(query).sort(sort).limit(5)
@@ -151,7 +151,7 @@ var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionNam
     projection = {};
   }
   var dbHandleForShutDowns;
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function (db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName).find(query).project(projection).limit(limit).toArray()
@@ -173,7 +173,7 @@ var findDocumentsBasedOnQuery = function findDocumentsBasedOnQuery(collectionNam
  */
 var countDocumentsByQuery = function countDocumentsByQuery(collectionName, query) {
   var dbHandleForShutDowns;
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function (db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName).find(query).count()
@@ -239,7 +239,7 @@ var workOnItPageByPage = function workOnItPageByPage(db, collectionName, query, 
  */
 var connectDb = function connectDb() {
   var dbHandleForShutDowns;
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function (db) {
       dbHandleForShutDowns = db;
       return Promise.resolve(db);
@@ -333,7 +333,7 @@ var insertOne = function insertOne(collectionName, document) {
     return Promise.resolve();
   }
   var dbHandleForShutDowns;
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function insertData(db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName).insertOne(Object.assign({}, document))
@@ -353,7 +353,7 @@ var insertOne = function insertOne(collectionName, document) {
  */
 var dropCollection = function dropCollection(name) {
   var dbHandleForShutDowns;
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function dropDb(db) {
       dbHandleForShutDowns = db;
       return db.listCollections().toArray();
@@ -386,7 +386,7 @@ var dropCollection = function dropCollection(name) {
  */
 var findDistinctDocuments = function findDistinctDocuments(collectionName, field) {
   var dbHandleForShutDowns;
-  return MongoClient.connect(process.env.DB_URL, {promiseLibrary: Promise})
+  return MongoClient.connect(process.env.MONGO_DB_URL, {promiseLibrary: Promise})
     .then(function (db) {
       dbHandleForShutDowns = db;
       return db.collection(collectionName);
