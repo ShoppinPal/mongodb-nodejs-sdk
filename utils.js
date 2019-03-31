@@ -21,10 +21,31 @@ class DBConnection {
     this.DB_URL = null;
   }
 
-  static async initialize(DB_URL) {
+  /**
+   * Method to initialize connection with the mongo database
+   * @param {string} DB_URL The details of the mongo DB server in format mongodb://[user]:[password]@[IP]:[port]/[database_name]
+   * @returns {null} Nothing
+   */
+  static async initialize(DB_URL) {// auto reconnects on issues losing network
     this.DB_URL = DB_URL;
     try {
       this.dbObject = await MongoClient.connect(this.DB_URL, { promiseLibrary: Promise });
+      // Other events can be added :: http://mongodb.github.io/node-mongodb-native/3.2/api/Server.html#event:error
+      this.dbObject
+      .on('error', (err) => {
+        // This event is unfortunately not bubbled up to the db handle correctly,
+        // see https://github.com/mongodb/node-mongodb-native/pull/1545
+        // This event is emitted when the driver ran out of `reconnectTries`. At this
+        // point you should either crash your app or manually try to reconnect.
+        // TODO :: Add graceful shutdown.
+        console.log('error', err);
+      })
+      .on('reconnect', () => {
+        console.log('reconnected');
+      })
+      .on('close', () => {
+        console.log('close');
+      });
       return {
         status: true,
       };
@@ -45,10 +66,10 @@ class DBConnection {
    */
   static async insertIntoDb(collectionName, documents) {
     if (documents.length < 1) {
-      return Promise.resolve({
+      return {
         status: true,
         text: 'No documents found to insert',
-      });
+      };
     }
     try {
       const resp = await DBConnection.dbObject.collection(collectionName).insertMany(documents, { w: 1 });
