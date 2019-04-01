@@ -14,16 +14,12 @@ All you need to be aware of are the methods of this SDK and all the methods retu
 # Sample Usage -
 
 ```
-var mongoUtils = require('mongodb-nodejs-sdk');
 
-var doSomethingWithTheSetOfDocuments = function doSomethingWithTheSetOfDocuments(){
-    return mongoUtils.findDocumentsBasedOnQuery('mongoCollectionName', {status: "done"}, 0, {_id: 0})
-        .then(function(documents){
-            console.log(`Documents found in collection mongoCollectionName`, documents.length); 
-            return Promise.resolve(documents); //Do anything with the set of returned documents.
-        })
-        .catch(function(error){
-            return Promise.reject(error);
-        });
-};
+const mongoUtils = require('./utils');
+
+mongoUtils.initialize(DB_URL).then(async (resp) => {
+  console.log('connected', resp);
+  const resp = await mongoUtils.insertIntoDb('testCollection', ['asds','dasdsa','dasds']);
+});
+
 ```
