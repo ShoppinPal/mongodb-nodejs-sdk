@@ -23,3 +23,26 @@ mongoUtils.initialize(DB_URL).then(async (resp) => {
 });
 
 ```
+
+
+const PromClient = require('./prometheus');
+
+
+await PromClient.initialize({ job: 'jobName', instance: myIP() });
+PromClient.expressMiddleware(app);
+PromClient.serveExpressMetrics(app);
+
+
+const counter = PromClient.getCounter({ name: 'nodejs_product_service', help: 'metric_help', labelNames: ['status', 'state'] });
+counter.inc({ status: 'retry', state: '0' });
+counter.inc({ status: 'fail', state: '0' });
+
+
+const histogram = PromClient.getHistogram({
+    name: 'nodejs_http_request_duration_seconds',
+    help: 'metric_help',
+    labelNames: ['route'],
+    buckets,
+  });
+const end = histogram.startTimer();
+end({ route, method });
