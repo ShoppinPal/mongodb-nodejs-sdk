@@ -15,6 +15,6 @@
     "bluebird": "3.5.0",
     "documentation": "6.3.0",
     "lodash": "4.17.4",
-    "mongodb": "2.2.29"
+    "mongodb": "3.6.1"
   }
 }
